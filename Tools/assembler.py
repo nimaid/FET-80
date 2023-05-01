@@ -525,12 +525,39 @@ class Assembler:
         self.asm.reset()
     
     
+    # Prunes redundant M instructions that have the same direct value
+    # Operates on self.assembled_code_objects in-place
+    def prune_redundant_m_direct(self):
+        # Just do a pass where we keep track of the value of the last MEM command
+        # If it was direct, and if the next MEM command that comes up has the same direct value, just do not copy that command.
+        new_code_objects = list()
+        last_mem_value = None 
+        for code_object in self.assembled_code_objects:
+            append_instruction = True
+            
+            # Check to see if we should not copy it
+            if code_object["type"] == AsmCodes.InstructionType.M_INSTRUCTION:
+                # `value` will be None whenever it is not a direct value
+                current_mem_value = code_object["value"]
+                if (last_mem_value is not None) and (current_mem_value is not None):
+                    # Last mem and this mem are both direct
+                    if last_mem_value == current_mem_value:
+                        #They were the same, therefore redundant
+                        append_instruction = False
+                last_mem_value = current_mem_value
+                
+            if append_instruction:
+                    new_code_objects.append(code_object)
+        
+        self.assembled_code_objects = new_code_objects
+    
+    
     # Main loop, where the assembly actually occurs
     def run(self):
         self.resolve_all_indirect_memory()
         self.resolve_loops()
         self.assemble_objects()
-    
+        self.prune_redundant_m_direct()
     
     # A helper to get the assembled objects
     def assembled_objects(self):
