@@ -3,12 +3,12 @@
 
 # First, store the pointer address (upper right SCREEN area)
 MOV @corner, SCREEN         # runs `MEM corner` first (OVERFLOWS!!!)
-ADD M, 16
+ADD @corner, 16
 
 # Now, set it so the upper right corner is on
 MOV @@corner, 0b00000001    # runs `MEM corner` and `MEM M` first
 # Then, set that pixel to off
-MOV M, 0b00000000           # `M` is still set to the pointer
+MOV @@corner, 0b00000000           # `M` is still set to the pointer
 
 # Do an infinite loop to halt
 (LOOP)
