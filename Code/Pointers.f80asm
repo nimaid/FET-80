@@ -2,7 +2,7 @@
 # We store a relative memory location (screen + offset), and change the contents from that memory location
 
 # First, store the pointer address (upper right SCREEN area)
-MOV @corner, SCREEN			# runs `MEM corner` first
+MOV @corner, SCREEN			# runs `MEM corner` first (OVERFLOWS!!!)
 ADD M, 16
 
 # Now, set it so the upper right corner is on

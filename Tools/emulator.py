@@ -669,7 +669,7 @@ class MainWindow:
 emu = Emulator()
 
 # Load the test code
-emu.load_program("../FET-80 Development/Test Code/Pointers.f80asm")
+emu.load_program("../Code/XOR.f80asm")
 
 
 # Make the main window
