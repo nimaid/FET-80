@@ -2,6 +2,7 @@
 
 from enum import Enum
 import tkinter as tk
+from tkinter import scrolledtext
 
 import helpers
 import assembler
@@ -431,6 +432,15 @@ class Emulator:
         self.fet80.program(self.current_program)
     
     
+    # Returns the source code text of the current program
+    def source_code(self):
+        if self.current_program is None:
+            raise Exception("No program has been loaded into the emulator yet!")
+        with open(self.current_program, "r") as f:
+            result = f.read()
+        return result
+    
+    
     # Get the current instruction
     def instruction(self):
         return self.fet80.instruction()
@@ -651,18 +661,37 @@ class MainWindow:
     def __init__(self):
         self.root = None
         self.emu = Emulator()
-        # Load the test code #TODO remove
-        self.emu.load_program("../Code/XOR.f80asm")
+        self.padding = 6
+    
+    
+    # Get the current program source code
+    def source_code(self):
+        return self.emu.source_code()
     
     
     # Returns the frame of the navbar
     def make_navbar(self):
-        return tk.Label(self.root, text="Hello, world! One day, I will be a navigation bar with buttons!", font="helvetica 18")
+        self.navbar = tk.Label(self.root, text="Hello, world! One day, I will be a navigation bar with buttons!", font="helvetica 18")
+        return self.navbar
     
     
     # Returns the frame of the source code area
     def make_source_area(self):
-        return tk.Label(self.root, text="I'll be source code one day.", font="helvetica 12")
+        self.source_text = scrolledtext.ScrolledText( self.root, 
+                                                      wrap   = tk.NONE, 
+                                                      width  = 45, 
+                                                      height = 30, 
+                                                      font   = ("Courier New", 12),
+                                                      state  = tk.DISABLED )
+        return self.source_text
+    
+    
+    # Sets the source area text
+    def set_textbox_text(self, text_object, text_in):
+        text_object.configure(state="normal")
+        text_object.delete(1.0, "end")
+        text_object.insert(1.0, text_in)
+        text_object.configure(state="disabled")
     
     
     # Returns the frame of the program code area
@@ -685,43 +714,56 @@ class MainWindow:
         return tk.Label(self.root, text="I'll be status info one day.", font="helvetica 12")
     
     
+    # Load a program into the emulator
+    def load_program(self, file_in):
+        self.emu.load_program(file_in)
+        # Update the UI
+        self.set_textbox_text(self.source_text, self.source_code())
+    
+    
+    # Main call
     def run(self):
         # Make window
         self.root = tk.Tk()
         
         # Make navbar area
         self.navbar = self.make_navbar()
-        self.navbar.grid(row=0, column=0, sticky="N", columnspan=3, pady=2)
+        self.navbar.grid(row=0, column=0, columnspan=3, padx=self.padding, pady=self.padding)
         
         # Make source text area
         self.source_area = self.make_source_area()
-        self.source_area.grid(row=1, column=0, sticky="W", pady=2)
+        self.source_area.grid(row=1, column=0, rowspan=2, padx=self.padding, pady=self.padding)
         
         # Make program code area
         self.code_area = self.make_code_area()
-        self.code_area.grid(row=2, column=1, pady=2)
+        self.code_area.grid(row=2, column=1, padx=self.padding, pady=self.padding)
         
         # Make RAM area
         self.memory_area = self.make_RAM_area()
-        self.memory_area.grid(row=1, column=1, pady=2)
+        self.memory_area.grid(row=1, column=1, padx=self.padding, pady=self.padding)
         
         # Make screen area
         self.screen_area = self.make_screen_area()
-        self.screen_area.grid(row=1, column=2, pady=2)
+        self.screen_area.grid(row=1, column=2, padx=self.padding, pady=self.padding)
         
         # Make info area
         self.info_area = self.make_info_area()
-        self.info_area.grid(row=2, column=2, pady=2)
+        self.info_area.grid(row=2, column=2, padx=self.padding, pady=self.padding)
         
         # Start main event loop
         self.root.mainloop()
-        
 # ~~~~~~~~ End GUI Definition ~~~~~~~~
 
 
 # ~~~~~~~~ Begin Main Program ~~~~~~~~
 # Make the main window
 main_window = MainWindow()
+
+# Run the main window loop
+main_window.run()
+
+# Load the test code #TODO remove
+#main_window.load_program("../Code/XOR.f80asm")  
 
 '''
 def main():
