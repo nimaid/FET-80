@@ -669,7 +669,7 @@ class MainWindow:
     def load_program(self, file_in):
         self.emu.load_program(file_in)
         # Update the UI
-        self.set_textbox_text(self.source_text, self.source_code())
+        self.set_textbox_text_numbered(self.source_text, self.source_code(), line_start=1)
     
     
     # Get the current program source code
@@ -707,12 +707,27 @@ class MainWindow:
         return self.source_text
     
     
-    # Sets the source area text
+    # Sets the a textbox's text
     def set_textbox_text(self, text_object, text_in):
         text_object.configure(state="normal")
         text_object.delete(1.0, "end")
         text_object.insert(1.0, text_in)
         text_object.configure(state="disabled")
+    
+    
+    # Sets the a textbox's text with numbered lines
+    def set_textbox_text_numbered(self, text_object, text_in, line_start=0, delimiter=". "):
+        text_lines = text_in.splitlines()
+        # Get the biggest number length
+        number_length = len(str(len(text_lines)))
+        text_processed = ""
+        for i, line in enumerate(text_lines):
+            new_line = str(line_start+i)
+            new_line = new_line.rjust(number_length)
+            new_line += delimiter + line + "\n"
+            text_processed += new_line
+        
+        self.set_textbox_text(text_object, text_processed)
     
     
     # Returns the frame of the program code area
