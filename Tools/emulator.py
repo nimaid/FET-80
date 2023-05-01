@@ -650,14 +650,68 @@ class Emulator:
 class MainWindow:
     def __init__(self):
         self.root = None
+        self.emu = Emulator()
+        # Load the test code #TODO remove
+        self.emu.load_program("../Code/XOR.f80asm")
+    
+    
+    # Returns the frame of the navbar
+    def make_navbar(self):
+        return tk.Label(self.root, text="Hello, world! One day, I will be a navigation bar with buttons!", font="helvetica 18")
+    
+    
+    # Returns the frame of the source code area
+    def make_source_area(self):
+        return tk.Label(self.root, text="I'll be source code one day.", font="helvetica 12")
+    
+    
+    # Returns the frame of the program code area
+    def make_code_area(self):
+        return tk.Label(self.root, text="I'll be program code one day.", font="helvetica 12")
+    
+    
+    # Returns the frame of the RAM area
+    def make_RAM_area(self):
+        return tk.Label(self.root, text="I'll be RAM contents one day.", font="helvetica 12")
+    
+    
+    # Returns the frame of the screen area
+    def make_screen_area(self):
+        return tk.Label(self.root, text="I'll be the screen one day.", font="helvetica 12")
+    
+    
+    # Returns the frame of the info area
+    def make_info_area(self):
+        return tk.Label(self.root, text="I'll be status info one day.", font="helvetica 12")
+    
     
     def run(self):
         # Make window
         self.root = tk.Tk()
         
-        #TODO
-        greeting = tk.Label(text="Hello, world!")
-        greeting.pack()
+        # Make navbar area
+        self.navbar = self.make_navbar()
+        self.navbar.grid(row=0, column=0, sticky="N", columnspan=3, pady=2)
+        
+        # Make source text area
+        self.source_area = self.make_source_area()
+        self.source_area.grid(row=1, column=0, sticky="W", pady=2)
+        
+        # Make program code area
+        self.code_area = self.make_code_area()
+        self.code_area.grid(row=2, column=1, pady=2)
+        
+        # Make RAM area
+        self.memory_area = self.make_RAM_area()
+        self.memory_area.grid(row=1, column=1, pady=2)
+        
+        # Make screen area
+        self.screen_area = self.make_screen_area()
+        self.screen_area.grid(row=1, column=2, pady=2)
+        
+        # Make info area
+        self.info_area = self.make_info_area()
+        self.info_area.grid(row=2, column=2, pady=2)
         
         # Start main event loop
         self.root.mainloop()
@@ -666,12 +720,6 @@ class MainWindow:
 
 
 # ~~~~~~~~ Begin Main Program ~~~~~~~~
-emu = Emulator()
-
-# Load the test code
-emu.load_program("../Code/XOR.f80asm")
-
-
 # Make the main window
 main_window = MainWindow()
 
