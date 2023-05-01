@@ -71,6 +71,16 @@ class Dec2:
         return False
 
 
+# A helper function to split a 16 bit number into bytes
+def split_bytes(n):
+    # Overflow input
+    n %= 2**16
+    
+    low = n & ((2**8)-1)
+    high = n >> 8
+    
+    return high, low
+
 
 # Used for the argument parser
 def file_path(string):
