@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 from enum import Enum
 import tkinter as tk
 from tkinter import scrolledtext
@@ -663,6 +664,7 @@ class MainWindow:
         self.root = None
         self.emu = Emulator()
         self.padding = 6
+        self.last_load_dir = "."
     
     
     # Load a program into the emulator
@@ -670,6 +672,7 @@ class MainWindow:
         self.emu.load_program(file_in)
         # Update the UI
         self.set_textbox_text_numbered(self.source_text, self.source_code(), line_start=1)
+        self.set_textbox_text_numbered(self.code_text, self.program_code(), line_start=0)
     
     
     # Get the current program source code
@@ -677,13 +680,22 @@ class MainWindow:
         return self.emu.source_code()
     
     
+    # Get the current program code as a symbolic string
+    def program_code(self):
+        out = ""
+        for line in self.emu.processed_assembly():
+            out += line + "\n"
+        return out
+    
+    
     # Open the GUI to load a file
     def load_file_gui(self):
         filetypes  = ( ("FET-80 assembly files", "*.f80asm" ),
                        ("All files"     , "*.*") )
         filename = filedialog.askopenfilename( title      = "Open a FET-80 Assembly File...",
-                                               initialdir = ".",
+                                               initialdir = self.last_load_dir ,
                                                filetypes  = filetypes )
+        self.last_load_dir = os.path.split(os.path.realpath(filename))[0]
         self.load_program(filename)  
     
     
@@ -701,13 +713,13 @@ class MainWindow:
         self.source_text = scrolledtext.ScrolledText( self.root, 
                                                       wrap   = tk.NONE, 
                                                       width  = 45, 
-                                                      height = 35, 
+                                                      height = 40, 
                                                       font   = ("Courier New", 10),
                                                       state  = tk.DISABLED )
         return self.source_text
     
     
-    # Sets the a textbox's text
+    # Sets a textbox's text
     def set_textbox_text(self, text_object, text_in):
         text_object.configure(state="normal")
         text_object.delete(1.0, "end")
@@ -715,7 +727,7 @@ class MainWindow:
         text_object.configure(state="disabled")
     
     
-    # Sets the a textbox's text with numbered lines
+    # Sets a textbox's text with numbered lines
     def set_textbox_text_numbered(self, text_object, text_in, line_start=0, delimiter=". "):
         text_lines = text_in.splitlines()
         # Get the biggest number length
@@ -732,7 +744,13 @@ class MainWindow:
     
     # Returns the frame of the program code area
     def make_code_area(self):
-        return tk.Label(self.root, text="I'll be program code one day.", font="helvetica 12")
+        self.code_text = scrolledtext.ScrolledText( self.root, 
+                                                    wrap   = tk.NONE, 
+                                                    width  = 45, 
+                                                    height = 20, 
+                                                    font   = ("Courier New", 10),
+                                                    state  = tk.DISABLED )
+        return self.code_text
     
     
     # Returns the frame of the RAM area
@@ -760,24 +778,28 @@ class MainWindow:
         self.navbar.grid(row=0, column=0, columnspan=3, padx=self.padding, pady=self.padding)
         
         # Make source text area
+        self.source_label = tk.Label(self.root, text="Source Assembly", font="helvetica 12")
+        self.source_label.grid(row=1, column=0, padx=self.padding, pady=self.padding)
         self.source_area = self.make_source_area()
-        self.source_area.grid(row=1, column=0, rowspan=2, padx=self.padding, pady=self.padding)
+        self.source_area.grid(row=2, column=0, rowspan=3, padx=self.padding, pady=self.padding)
         
         # Make program code area
+        self.source_label = tk.Label(self.root, text="Program Code", font="helvetica 12")
+        self.source_label.grid(row=1, column=1, padx=self.padding, pady=self.padding)
         self.code_area = self.make_code_area()
         self.code_area.grid(row=2, column=1, padx=self.padding, pady=self.padding)
         
-        # Make RAM area
-        self.memory_area = self.make_RAM_area()
-        self.memory_area.grid(row=1, column=1, padx=self.padding, pady=self.padding)
-        
         # Make screen area
         self.screen_area = self.make_screen_area()
-        self.screen_area.grid(row=1, column=2, padx=self.padding, pady=self.padding)
+        self.screen_area.grid(row=2, column=2, padx=self.padding, pady=self.padding)
+        
+        # Make RAM area
+        self.memory_area = self.make_RAM_area()
+        self.memory_area.grid(row=4, column=1, padx=self.padding, pady=self.padding)
         
         # Make info area
         self.info_area = self.make_info_area()
-        self.info_area.grid(row=2, column=2, padx=self.padding, pady=self.padding)
+        self.info_area.grid(row=4, column=2, padx=self.padding, pady=self.padding)
         
         # Start main event loop
         self.root.mainloop()
