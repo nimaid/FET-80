@@ -3,6 +3,7 @@
 from enum import Enum
 import tkinter as tk
 from tkinter import scrolledtext
+from tkinter import filedialog
 
 import helpers
 import assembler
@@ -664,14 +665,34 @@ class MainWindow:
         self.padding = 6
     
     
+    # Load a program into the emulator
+    def load_program(self, file_in):
+        self.emu.load_program(file_in)
+        # Update the UI
+        self.set_textbox_text(self.source_text, self.source_code())
+    
+    
     # Get the current program source code
     def source_code(self):
         return self.emu.source_code()
     
     
+    # Open the GUI to load a file
+    def load_file_gui(self):
+        filetypes  = ( ("FET-80 assembly files", "*.f80asm" ),
+                       ("All files"     , "*.*") )
+        filename = filedialog.askopenfilename( title      = "Open a FET-80 Assembly File...",
+                                               initialdir = ".",
+                                               filetypes  = filetypes )
+        self.load_program(filename)  
+    
+    
     # Returns the frame of the navbar
     def make_navbar(self):
-        self.navbar = tk.Label(self.root, text="Hello, world! One day, I will be a navigation bar with buttons!", font="helvetica 18")
+        self.navbar = tk.Button( self.root, 
+                                 text = "Load File...",
+                                 bd = 2,
+                                 command = self.load_file_gui )
         return self.navbar
     
     
@@ -680,8 +701,8 @@ class MainWindow:
         self.source_text = scrolledtext.ScrolledText( self.root, 
                                                       wrap   = tk.NONE, 
                                                       width  = 45, 
-                                                      height = 30, 
-                                                      font   = ("Courier New", 12),
+                                                      height = 35, 
+                                                      font   = ("Courier New", 10),
                                                       state  = tk.DISABLED )
         return self.source_text
     
@@ -712,13 +733,6 @@ class MainWindow:
     # Returns the frame of the info area
     def make_info_area(self):
         return tk.Label(self.root, text="I'll be status info one day.", font="helvetica 12")
-    
-    
-    # Load a program into the emulator
-    def load_program(self, file_in):
-        self.emu.load_program(file_in)
-        # Update the UI
-        self.set_textbox_text(self.source_text, self.source_code())
     
     
     # Main call
