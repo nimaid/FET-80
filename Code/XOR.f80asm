@@ -37,7 +37,7 @@ MOV B, @Nand3
 NAND A, B           # Final XOR result is in A now
 
 # Move to final location
-MOV @0xFFF1, A      # It is finally in the output location
+MOV @IO0, A      # It is finally in the output location
 
 # Do an infinite loop to halt
 (LOOP)
