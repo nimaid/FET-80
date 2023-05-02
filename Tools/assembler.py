@@ -57,8 +57,8 @@ class AsmCodes:
 # A class to store FET-80 specific parameters
 class Fet80Params:
     # Bit widths
-    DataWidth = 8
-    AddressWidth = DataWidth * 2
+    DataWidth = 16
+    AddressWidth = DataWidth
     
     # Assembler constants
     AsmConstants = [ {"name" : "R0", "value" : 0},
